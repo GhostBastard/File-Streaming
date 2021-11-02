@@ -49,7 +49,7 @@ namespace FileStreaming
             group.listOfStud.Add(new Student(4, "Aleksandr", "Makarchenko", "1234567", "qweth@mail.com", 43));
             group.listOfStud.Add(new Student(5, "Aleksandr", "Makarchenko", "1234567", "qweth@mail.com", 43));
 
-            //WriteInfo(path, group);
+            
 
             using (FileStream fileStream = new FileStream(path, FileMode.Append))
             {
