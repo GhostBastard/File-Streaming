@@ -7,18 +7,12 @@ namespace FileStreaming
 {
     class Program
     {
-        static void WriteInfo(string path, Group group)
+        static byte[] WriteGroupInfo(Group group, out int arrLen)
         {
-            bool rewrite = false;
-            Console.WriteLine(@"Rewrite file?(y\n)");
-            char x = Convert.ToChar(Console.ReadLine());
-            if(x == 'y'){ rewrite = false; }
-            else if (x == 'n'){rewrite = true;}
-            using (StreamWriter sw = new StreamWriter(path, rewrite))
-            {
-                sw.WriteLine($"Group: {group.GroupName} {group.GroupId}, course - {group.Course}");
-                foreach (Student st in group.listOfStud) { sw.WriteLine(st); }
-            }
+            string groupInfo = $"Group: {group.GroupName} {group.GroupId}, course - {group.Course}\n";
+            byte[] array = System.Text.Encoding.Default.GetBytes(groupInfo);
+            arrLen = array.Length;
+            return array;
         }
 
         static void Main(string[] args)
@@ -33,8 +27,19 @@ namespace FileStreaming
 
             string path = @"C:\Users\Aleksandr\Desktop\groups.txt";
 
-            WriteInfo(path, group);
             
+            using (FileStream fileStream = new FileStream(path, FileMode.Create))
+            {
+                string Text;
+                int arrLen;
+                fileStream.Write(WriteGroupInfo(group, out arrLen), 0, arrLen);
+                foreach (Student st in group.listOfStud)
+                {
+                    Text = st.ToString() + "\n";
+                    byte[] array = System.Text.Encoding.Default.GetBytes(Text);
+                    fileStream.Write(array, 0, array.Length);
+                }
+            }
 
             group = new Group(43, "SZD", 4);
             group.listOfStud = new List<Student>();
@@ -44,22 +49,38 @@ namespace FileStreaming
             group.listOfStud.Add(new Student(4, "Aleksandr", "Makarchenko", "1234567", "qweth@mail.com", 43));
             group.listOfStud.Add(new Student(5, "Aleksandr", "Makarchenko", "1234567", "qweth@mail.com", 43));
 
-            WriteInfo(path, group);
+            //WriteInfo(path, group);
 
-            using (StreamReader sr = new StreamReader(path))
+            using (FileStream fileStream = new FileStream(path, FileMode.Append))
             {
-                Console.WriteLine(sr.ReadToEnd());
+                string Text;
+                int arrLen;
+                fileStream.Write(WriteGroupInfo(group, out arrLen), 0, arrLen);
+                foreach (Student st in group.listOfStud)
+                {
+                    Text = st.ToString() + "\n";
+                    byte[] array = System.Text.Encoding.Default.GetBytes(Text);
+                    fileStream.Write(array, 0, array.Length);
+                }
             }
 
-            Console.ReadKey();
+            using (FileStream fileStream = File.OpenRead(path))
+            {
+                byte[] array = new byte[fileStream.Length];
+                fileStream.Read(array, 0, array.Length);
+                string data = System.Text.Encoding.Default.GetString(array);
+                Console.WriteLine($"{data}");
+            }
 
-            
+            Console.ReadLine();
 
-            
-            
 
-            
-            
+
+
+
+
+
+
         }
     }
 }
